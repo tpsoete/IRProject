@@ -1,0 +1,11 @@
+.vs/
+Debug/
+Release/
+x64/
+
+*.dll
+*.user
+
+# ÊäÈëÊä³ö
+Reuters/
+Output/
