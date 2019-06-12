@@ -4,6 +4,10 @@
 #include<vector>
 #include<iostream>
 
+#ifdef _MSC_VER
+#pragma warning(disable:4996)
+#endif
+
 void word_stem(char* s);
 
 std::string reuters(int i);

@@ -1,33 +1,56 @@
 #include "InvertedIndex.h"
 
-using std::cin;
-using std::cout;
+using namespace std;
+
+// commands
 
 void help()
 {
 	// hint info
 	puts("exit - exit this program");
 	puts("help - print this help");
+    
+    puts("stem - word stemming");
 }
 
-InvertedIndex index;
-
-bool console()
+void stem_test()
 {
-	std::string input;
-	cout << ">>>";
-	cin >> input;
-	if (input == "exit") return false;
-	else if (input == "help") help();
-	// else ...
+    static char buf[256];
+    scanf("%s", buf);
+    word_stem(buf);
+    puts(buf);
+}
 
-	return true;
+// command handling
+
+map<string, void(*)()> cmd;
+void bind_command()
+{
+    // connect input strings with functions
+    cmd["help"] = help;
+    cmd["stem"] = stem_test;
 }
 
 int main()
 {
+    string input;
 	help();
-	while (console());
+    bind_command();
+    for(;;) {
+        cout << ">>> ";
+        cin >> input;
+        if(input == "exit") break;
+        auto it = cmd.find(input);
+        if(it == cmd.end()) {
+            cerr << "Unknown command " << input << endl;
+            help();
+        }
+        else (it->second)();
+        getline(cin, input);    // clear the rest input in the line
+    }
+    puts("");
+#ifdef _MSC_VER
 	system("pause");
+#endif
 	return 0;
 }

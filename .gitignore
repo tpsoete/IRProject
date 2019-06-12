@@ -6,6 +6,10 @@ x64/
 *.dll
 *.user
 
+# xcode
+*.xcodeproj
+.DS_Store
+
 # ÊäÈëÊä³ö
 Reuters/
 Output/
