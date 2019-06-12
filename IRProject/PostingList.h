@@ -5,7 +5,7 @@
 struct IndexNode
 {
 	size_t docID;
-	std::vector<size_t> location;	// where are the words in the document, its size is frequency
+	std::vector<size_t> position;	// sorted word positions in the document, its size is frequency
 };
 
 class PostingList

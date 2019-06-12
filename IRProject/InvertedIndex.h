@@ -8,8 +8,15 @@ class InvertedIndex
 public:
 	std::vector<std::string> docName;
 	std::map<std::string, PostingList> dictionary;
+    
+    bool bWordStem;
+    bool bUseStopword;
 
 	InvertedIndex();
 	~InvertedIndex();
+    
+    void AddFile(std::string filename);
+    std::vector<size_t> Search(std::string word);
+    std::vector<size_t> TopK(std::string words[], int k);
 };
 
