@@ -119,11 +119,13 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PorterStemmer.c" />
     <ClCompile Include="PostingList.cpp" />
+    <ClCompile Include="TextFile.cpp" />
     <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InvertedIndex.h" />
     <ClInclude Include="PostingList.h" />
+    <ClInclude Include="TextFile.h" />
     <ClInclude Include="util.h" />
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,5 @@
 #include "InvertedIndex.h"
-
+#include "TextFile.h"
 
 
 InvertedIndex::InvertedIndex()
@@ -13,15 +13,52 @@ InvertedIndex::~InvertedIndex()
 
 void InvertedIndex::AddFile(std::string filename)
 {
-    
+	TextFile f(filename.c_str());
+	// the file is not exist
+	if (f.file == NULL) {
+		printf("%s does not exist!\n", filename.c_str());
+		return;
+	}
+	size_t l = filename.length(), docn = docName.size();
+	// allocate memory for filenames and assign a new id for the document
+	docName.push_back(filename);
+
+	char c[256];
+	// word counter
+	size_t cnt = 0;
+	// INDEX GENERATION
+	while (f.GetWord(c)) {
+		// standardize the word
+		word_stem(c);
+		std::string cs(c);
+		// find the word and insert if unfound
+		auto it = dictionary.find(cs);
+		if (it == dictionary.end()) it = dictionary.emplace(cs, PostingList()).first;
+		PostingList& p = it->second;
+		// store the index
+		p.Add(docn, ++cnt);
+	}
 }
 
 std::vector<size_t> InvertedIndex::Search(std::string word)
 {
-    return std::vector<size_t>();
+	std::vector<size_t> ans;
+	word = word_stem(word);
+	auto it = dictionary.find(word);
+	if (it == dictionary.end()) return ans;
+	for (auto& node : it->second.list) ans.push_back(node.docID);
+	it->second.Output(word);
+	return ans;
 }
 
 std::vector<size_t> InvertedIndex::TopK(std::string words[], int k)
 {
     return std::vector<size_t>();
+}
+
+void InvertedIndex::Output() const
+{
+	for (auto& p : dictionary) {
+		p.second.Output(p.first);
+	}
 }

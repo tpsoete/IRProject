@@ -5,7 +5,7 @@
 struct IndexNode
 {
 	size_t docID;
-	std::vector<size_t> position;	// sorted word positions in the document, its size is frequency
+	std::vector<size_t> positions;	// sorted word positions in the document, its size is frequency
 };
 
 class PostingList
@@ -13,9 +13,12 @@ class PostingList
 public:
 	std::vector<IndexNode> list;
 	size_t frequency;
-	bool stop;		// whether the word is a stop word
 
 	PostingList();
 	~PostingList();
+
+	void Add(size_t docID, size_t position);
+
+	void Output(std::string word = "") const;
 };
 

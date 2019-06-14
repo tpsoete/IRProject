@@ -17,6 +17,16 @@ void word_stem(char* s)
 	s[l] = '\0';
 }
 
+std::string word_stem(const std::string & s)
+{
+	char* buf = new char[s.length() + 1];
+	strcpy(buf, s.c_str());
+	word_stem(buf);
+	std::string ans(buf);
+	delete[] buf;
+	return ans;
+}
+
 std::string reuters(int i)
 {
 	static char s[30];

@@ -1,41 +1,62 @@
 #include "InvertedIndex.h"
+#include <functional>
 
 using namespace std;
 
-// commands
+InvertedIndex idx; 
 
-void help()
-{
-	// hint info
-	puts("exit - exit this program");
-	puts("help - print this help");
-    
-    puts("stem - word stemming");
-}
-
-void stem_test()
-{
-    static char buf[256];
-    scanf("%s", buf);
-    word_stem(buf);
-    puts(buf);
-}
-
-// command handling
-
-map<string, void(*)()> cmd;
+map<string, function<void()> > cmd;
 void bind_command()
 {
+	static char buf[256];
+
     // connect input strings with functions
-    cmd["help"] = help;
-    cmd["stem"] = stem_test;
+
+	cmd["help"] = []() {	
+		// hint info
+		puts("exit - exit this program");
+		puts("help - print this help");
+
+		puts("stem %s - word stemming"); 
+		puts("search %s - simple search, return the posting list");
+		puts("add %d - add a Reuter document");
+	};
+
+	cmd["stem"] = []() {
+		scanf("%s", buf);
+		word_stem(buf);
+		puts(buf);
+	};
+
+	cmd["search"] = []() {
+		string s;
+		cin >> s;
+		auto v = idx.Search(s);
+		if (v.empty()) puts("No result!");
+	};
+
+	cmd["add"] = []() {
+		int i;
+		cin >> i;
+		idx.AddFile(reuters(i));
+	};
+
+	cmd["check"] = []() {
+		idx.Output();
+	};
+
+	cmd["names"] = []() {
+		puts("docID\tName");
+		for (size_t i = 0; i < idx.docName.size(); i++)
+			printf("%zd\t%s\n", i, idx.docName[i].c_str());
+	};
 }
 
 int main()
 {
     string input;
-	help();
     bind_command();
+	cmd["help"]();
     for(;;) {
         cout << ">>> ";
         cin >> input;
@@ -43,7 +64,7 @@ int main()
         auto it = cmd.find(input);
         if(it == cmd.end()) {
             cerr << "Unknown command " << input << endl;
-            help();
+			cmd["help"]();
         }
         else (it->second)();
         getline(cin, input);    // clear the rest input in the line

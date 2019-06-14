@@ -9,5 +9,6 @@
 #endif
 
 void word_stem(char* s);
+std::string word_stem(const std::string& s);
 
 std::string reuters(int i);
