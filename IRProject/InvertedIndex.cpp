@@ -51,14 +51,11 @@ std::vector<size_t> InvertedIndex::Search(std::string word)
 	return ans;
 }
 
-std::vector<size_t> InvertedIndex::TopK(std::string words[], int k)
+std::vector<size_t> InvertedIndex::TopK(std::vector<std::string> words, int k)
 {
-	struct doc_with_score {
-		size_t doc_id;
-		double scrore;
-	};
 	std::vector<size_t> ans;
 	std::vector<doc_with_score> heap;
+	heap = get_scores(words);
 	for (int n = 0; n < k; n++) {
 		size_t CurrentSize = heap.size();
 		for (int i = CurrentSize / 2 - 1; i >= 0; i--)
@@ -84,6 +81,39 @@ std::vector<size_t> InvertedIndex::TopK(std::string words[], int k)
 		heap.pop_back();
 	}
     return ans;
+}
+
+std::vector<doc_with_score> InvertedIndex::get_scores(std::vector<std::string> words)
+{
+	std::vector<doc_with_score> scores;
+	const size_t N = docName.size();
+	const size_t M = words.size();
+	std::vector<std::vector<double>> W;//tf-idf vector space, M-N+1
+	//get the vector space
+	std::vector<double> w;
+	for (int i = 0; i < M; i++) {
+		auto List = dictionary.find(words[i])->second;
+		size_t df = List.list.size();
+		for (int j = 0; j < N; j++) {
+			size_t tf = List.get_tf(j);
+			w.push_back((1 + log(tf))*log(N / df));
+		}
+		w.push_back((1 + log(1))*log(N / df));//tf-idf of the searching words
+		W.push_back(w);
+		w.clear();
+	}
+	//get cosine score of all the document with the searching words
+	for (int i = 0; i < N; i++) {
+		double score=0;
+		for (int j = 0; j < M; j++) {
+			score += W[j][i] * W[j][N];
+		}
+		doc_with_score s;
+		s.doc_id = i;
+		s.scrore = score;
+		scores.push_back(s);
+	}
+	return scores;
 }
 
 void InvertedIndex::Output() const
