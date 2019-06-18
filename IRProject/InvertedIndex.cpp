@@ -53,7 +53,37 @@ std::vector<size_t> InvertedIndex::Search(std::string word)
 
 std::vector<size_t> InvertedIndex::TopK(std::string words[], int k)
 {
-    return std::vector<size_t>();
+	struct doc_with_score {
+		size_t doc_id;
+		double scrore;
+	};
+	std::vector<size_t> ans;
+	std::vector<doc_with_score> heap;
+	for (int n = 0; n < k; n++) {
+		size_t CurrentSize = heap.size();
+		for (int i = CurrentSize / 2 - 1; i >= 0; i--)
+		{
+			doc_with_score temp = heap[i];
+			int c = 2 * i + 1;
+			while (c <= CurrentSize)
+			{
+				if (c < CurrentSize && heap[c].scrore < heap[c + 1].scrore)
+					c++;
+				if (temp.scrore >= heap[c].scrore)
+					break;
+				else
+				{
+					heap[(c - 1) / 2] = heap[c];
+					c = 2 * c + 1;
+				}        
+			}
+			heap[(c - 1) / 2] = temp;
+		}
+		ans.push_back(heap[0].doc_id);
+		heap[0] = heap[CurrentSize - 1];
+		heap.pop_back();
+	}
+    return ans;
 }
 
 void InvertedIndex::Output() const
