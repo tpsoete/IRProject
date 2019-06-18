@@ -105,7 +105,16 @@ void bind_command()
 		string s;
 		getline(cin, s);
 		auto ans = idx.Boolean_serach(s);
-		for (auto& str : ans) cout << str << endl;
+		//for (auto& str : ans) cout << str << endl;
+		if (ans.size() == 0)
+			cout << "No Result!" << endl;
+		else {
+			cout << ans.size() << " result(s) found for " << s << ":" << endl;
+			for (auto str : ans) {
+				cout << "\tDoc ID: " << str << endl;
+			}
+		}
+		
 	};
 
 	// debug
