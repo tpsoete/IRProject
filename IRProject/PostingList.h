@@ -4,7 +4,7 @@
 
 struct doc_with_score {
 	size_t doc_id;
-	double scrore;
+	double score;
 };
 
 struct IndexNode
