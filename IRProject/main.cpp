@@ -44,6 +44,8 @@ void bind_command()
 		cin >> s;
 		auto v = idx.Search(s);
 		if (v.empty()) puts("No result!");
+		for (auto id : v) cout << idx.docName[id] << endl;
+		printf("Found %zd document(s)\n", v.size());
 	};
 
 	cmd["add"] = []() {
@@ -104,8 +106,10 @@ void bind_command()
 	cmd["boolean"] = [] {
 		string s;
 		getline(cin, s);
+		cin.unget();
 		auto ans = idx.Boolean_serach(s);
-		for (auto& str : ans) cout << str << endl;
+		for (auto id : ans) cout << idx.docName[id] << endl;
+		printf("Found %zd document(s)\n", ans.size());
 	};
 
 	// debug

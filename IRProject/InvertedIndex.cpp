@@ -56,7 +56,7 @@ std::vector<size_t> InvertedIndex::Search(std::string word)
 	auto it = dictionary.find(word);
 	if (it == dictionary.end()) return ans;
 	for (auto& node : it->second.list) ans.push_back(node.docID);
-	it->second.Output(word);
+	//it->second.Output(word);
 	return ans;
 }
 
