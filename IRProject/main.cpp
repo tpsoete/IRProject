@@ -21,20 +21,22 @@ void bind_command()
 
 	cmd["help"] = []() {	
 		// hint info
+		puts("");
 		puts("exit - exit this program");
 		puts("help - print this help");
 		puts("");
-		puts("stem %s - word stemming"); 
-		puts("search %s - simple search, return the posting list");
 		puts("add %d - add a Reuter document");
+		puts("addall - add all document, very slow");
+		puts("adduntil %d - add all documents before the number");
+		puts("search %s - simple search, return the posting list");
+		puts("");
 		puts("wildcard %s - wildcard search, only return unstemmed words for simplicity");
 		puts("topk %d %s %s ... - TopK search, the first parameter is k. e.g. 'topk 3 how much'");
-	};
-
-	cmd["stem"] = []() {
-		scanf("%s", buf);
-		word_stem(buf);
-		puts(buf);
+		puts("boolean <boolean expression> - boolean search");
+		puts("");
+		puts("stem %s - word stemming");
+		puts("names - all loaded documents");
+		puts("");
 	};
 
 	cmd["search"] = []() {
@@ -42,12 +44,15 @@ void bind_command()
 		cin >> s;
 		auto v = idx.Search(s);
 		if (v.empty()) puts("No result!");
+		for (auto id : v) cout << idx.docName[id] << endl;
+		printf("Found %zd document(s)\n", v.size());
 	};
 
 	cmd["add"] = []() {
 		int i;
 		cin >> i;
-		idx.AddFile(reuters(i));
+		if (!idx.AddFile(reuters(i))) 
+			puts("No such file!");
 	};
 
 	cmd["addall"] = []() {
@@ -58,6 +63,19 @@ void bind_command()
 		}
 		all = true;
 	};
+
+	cmd["adduntil"] = []() {
+		if (all) return;
+		int n;
+		cin >> n;
+		for (int i = 1; i <= n; i++) {
+			idx.AddFile(reuters(i));
+			if (i % 200 == 0) printf("%d\n", i);
+		}
+		all = true;
+	};
+
+	// search
 
 	cmd["wildcard"] = []() {
 		string s;
@@ -79,16 +97,27 @@ void bind_command()
 		cin.unget();
 		words = split(s);
 		for (auto& str : words) str = word_stem(str);
-		auto ans = idx.get_scores(words);
+		auto ans = idx.TopK(words,k);
 		for (auto x : ans) {
 			printf("%20s%20f\n", idx.docName[x.doc_id].c_str(), x.score);
 		}
 	};
 
+	cmd["boolean"] = [] {
+		string s;
+		getline(cin, s);
+		cin.unget();
+		auto ans = idx.Boolean_serach(s);
+		for (auto id : ans) cout << idx.docName[id] << endl;
+		printf("Found %zd document(s)\n", ans.size());
+	};
+
 	// debug
 
-	cmd["check"] = []() {
-		idx.Output();
+	cmd["stem"] = []() {
+		scanf("%s", buf);
+		word_stem(buf);
+		puts(buf);
 	};
 
 	cmd["names"] = []() {
@@ -97,29 +126,10 @@ void bind_command()
 			printf("%zd\t%s\n", i, idx.docName[i].c_str());
 	};
 
-	// test for permuterm index
-
-	cmd["permadd"] = []() {
-		string s;
-		cin >> s;
-		pmx.Add(s);
-	};
-
-	cmd["perm"] = []() {
-		string s;
-		cin >> s;
-		auto ans = pmx.Wildcard(s);
-		for (auto& str : ans) cout << str << endl;
-	};
-
-	cmd["permlist"] = []() {
-		pmx.Output();
-	};
-
-	cmd["perminit"] = []() {
-		pmx.Add("this");
-		pmx.Add("that");
-		pmx.Add("thus");
+	cmd["dict"] = []() {
+		for (auto& p : idx.dictionary) {
+			puts(p.first.c_str());
+		}
 	};
 	cmd["phrase"] = []() {
 		string s;
