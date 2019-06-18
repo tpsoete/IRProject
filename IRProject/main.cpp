@@ -44,6 +44,8 @@ void bind_command()
 		cin >> s;
 		auto v = idx.Search(s);
 		if (v.empty()) puts("No result!");
+		for (auto id : v) cout << idx.docName[id] << endl;
+		printf("Found %zd document(s)\n", v.size());
 	};
 
 	cmd["add"] = []() {
@@ -104,17 +106,10 @@ void bind_command()
 	cmd["boolean"] = [] {
 		string s;
 		getline(cin, s);
+		cin.unget();
 		auto ans = idx.Boolean_serach(s);
-		//for (auto& str : ans) cout << str << endl;
-		if (ans.size() == 0)
-			cout << "No Result!" << endl;
-		else {
-			cout << ans.size() << " result(s) found for " << s << ":" << endl;
-			for (auto str : ans) {
-				cout << "\tDoc ID: " << str << endl;
-			}
-		}
-		
+		for (auto id : ans) cout << idx.docName[id] << endl;
+		printf("Found %zd document(s)\n", ans.size());
 	};
 
 	// debug
@@ -136,6 +131,22 @@ void bind_command()
 			puts(p.first.c_str());
 		}
 	};
+	cmd["phrase"] = []() {
+		string s;
+		getline(cin, s);
+		vector<std::string>words;
+		words = split(s);
+		for (auto& str : words) str = word_stem(str);
+		idx.Phrase(words);
+	};
+	
+	/*cmd["xbrdebug"] = []() {
+		vector<std::string> words(2);
+		words[0] = "crop";
+		words[1] = "cocoa";
+		for (auto& str : words) str = word_stem(str);
+		idx.Phrase(words);
+	};*/
 }
 
 int main()

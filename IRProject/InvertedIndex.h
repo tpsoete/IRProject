@@ -26,6 +26,8 @@ public:
 	std::vector<size_t> Boolean_serach(std::string cmd); //boolean search
 	std::string Spell_correction(std::string error_word); //spell correction
 
+	std::vector<size_t>Phrase(std::vector<std::string>word_input);//短语查询
+	PostingList Intersect(PostingList p1, PostingList p2, int k);//基于位置索引的合并算法
 	void Output() const;
 };
 
