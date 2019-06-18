@@ -4,13 +4,14 @@
 #include "PermutermIndex.h"
 #include <algorithm>
 #include <sstream>
+#include <unordered_map>
 
 class InvertedIndex
 {
 public:
 	std::vector<std::string> docName;	// docID and corresponding document name
 	std::vector<size_t> docLength;	// how many words in the document
-	std::map<std::string, PostingList> dictionary;
+	std::unordered_map<std::string, PostingList> dictionary;
 	PermutermIndex permuterms;
 
 	bool bWildcard;		// enable wildcard search

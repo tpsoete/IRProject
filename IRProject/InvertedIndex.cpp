@@ -1,5 +1,6 @@
 #include "InvertedIndex.h"
 #include "TextFile.h"
+#include <cmath>
 
 
 InvertedIndex::InvertedIndex()
@@ -171,7 +172,7 @@ std::vector<size_t> InvertedIndex::Phrase(std::vector<std::string> word_input)//
 	{
 		std::cout << "not found";
 	}
-	list_p1.Output();
+	//list_p1.Output();
 	return res;//输出list_p1的转化项
 }
 
@@ -409,7 +410,8 @@ std::string InvertedIndex::Spell_correction(std::string source) {
 		}
 		scores.push_back(matrix[n][m]);
 		all_words.push_back(target);
-
+		if (all_words.size() % 1000 == 0) printf("%.2f%%\n", all_words.size() * 100.0 / dictionary.size());
+		++it;
 	}
 	for (int i = 0; i < scores.size(); ++i) {
 		if (scores[min_index] >= scores[i]) {

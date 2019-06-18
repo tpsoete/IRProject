@@ -1,5 +1,6 @@
 #include "InvertedIndex.h"
 #include <functional>
+#include <ctime>
 
 using namespace std;
 
@@ -30,10 +31,13 @@ void bind_command()
 		puts("adduntil %d - add all documents before the number");
 		puts("search %s - simple search, return the posting list");
 		puts("");
-		puts("wildcard %s - wildcard search, only return unstemmed words for simplicity");
 		puts("topk %d %s %s ... - TopK search, the first parameter is k. e.g. 'topk 3 how much'");
 		puts("boolean <boolean expression> - boolean search");
+		puts("phrase %s %s ... - phrase search");
 		puts("");
+
+		puts("wildcard-word %s - wildcard search, only return unstemmed words");
+		puts("fuzzy-word %s - fuzzy search with correction, return the most likely word");
 		puts("stem %s - word stemming");
 		puts("names - all loaded documents");
 		puts("");
@@ -68,21 +72,18 @@ void bind_command()
 		if (all) return;
 		int n;
 		cin >> n;
+		clock_t start = clock();
+		n = min(n, 22000);
+		int step = n / 20;
 		for (int i = 1; i <= n; i++) {
 			idx.AddFile(reuters(i));
-			if (i % 200 == 0) printf("%d\n", i);
+			if (i % step == 0) printf("%d\n", i);
 		}
+		printf("Time used %.3f s\n", double(clock() - start) / CLOCKS_PER_SEC);
 		all = true;
 	};
 
 	// search
-
-	cmd["wildcard"] = []() {
-		string s;
-		cin >> s;
-		auto ans = idx.permuterms.Wildcard(s);
-		for (auto& str : ans) cout << str << endl;
-	};
 
 	cmd["topk"] = []() {
 		int k;
@@ -112,6 +113,29 @@ void bind_command()
 		printf("Found %zd document(s)\n", ans.size());
 	};
 
+	cmd["phrase"] = []() {
+		string s;
+		getline(cin, s);
+		vector<std::string>words;
+		words = split(s);
+		for (auto& str : words) str = word_stem(str);
+		auto ans = idx.Phrase(words);
+		for (auto id : ans) cout << idx.docName[id] << endl;
+	};
+
+	cmd["wildcard-word"] = []() {
+		string s;
+		cin >> s;
+		auto ans = idx.permuterms.Wildcard(s);
+		for (auto& str : ans) cout << str << endl;
+	};
+
+	cmd["fuzzy-word"] = []() {
+		string s;
+		cin >> s;
+		cout << idx.Spell_correction(s) << endl;
+	};
+
 	// debug
 
 	cmd["stem"] = []() {
@@ -130,14 +154,6 @@ void bind_command()
 		for (auto& p : idx.dictionary) {
 			puts(p.first.c_str());
 		}
-	};
-	cmd["phrase"] = []() {
-		string s;
-		getline(cin, s);
-		vector<std::string>words;
-		words = split(s);
-		for (auto& str : words) str = word_stem(str);
-		idx.Phrase(words);
 	};
 	
 	/*cmd["xbrdebug"] = []() {
