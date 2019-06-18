@@ -45,6 +45,7 @@ void InvertedIndex::AddFile(std::string filename)
 		// store the index
 		p.Add(docn, ++cnt);
 	}
+	docLength.push_back(cnt);
 }
 
 std::vector<size_t> InvertedIndex::Search(std::string word)

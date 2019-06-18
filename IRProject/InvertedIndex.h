@@ -7,6 +7,7 @@ class InvertedIndex
 {
 public:
 	std::vector<std::string> docName;	// docID and corresponding document name
+	std::vector<size_t> docLength;	// how many words in the document
 	std::map<std::string, PostingList> dictionary;
 	PermutermIndex permuterms;
 
