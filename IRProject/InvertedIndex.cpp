@@ -149,7 +149,7 @@ std::vector<size_t> InvertedIndex::Boolean_serach(std::string cmd) {
 	std::vector<std::string> tokens;
 	std::vector<size_t> result;
 
-	int op_flag = 1;
+	int op_flag = 2;
 	//0 for waiting for 'AND' or 'OR', 1 for 'AND' and 2 for 'OR'
 	bool not_flag = false;
 
@@ -238,8 +238,8 @@ std::vector<size_t> InvertedIndex::Boolean_serach(std::string cmd) {
 					else if (result[index1] > tmp[index2]) {
 						++index2;
 					}
-					break;
 				}
+				break;
 			case 2: //case : OR
 				while (index1 < result.size() && index2 < tmp.size()) {
 					if (result[index1] < tmp[index2]) {
