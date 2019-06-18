@@ -19,7 +19,8 @@ public:
     std::vector<size_t> Search(std::string word);	// simple search for a single word
     std::vector<size_t> TopK(const std::vector<std::string>& words, int k);
     std::vector<doc_with_score> get_scores(const std::vector<std::string>& words);
-
+	std::vector<size_t>Phrase(std::vector<std::string>word_input);//短语查询
+	PostingList Intersect(PostingList p1, PostingList p2, int k);//基于位置索引的合并算法
 	void Output() const;
 };
 

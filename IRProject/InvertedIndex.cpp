@@ -137,6 +137,102 @@ std::vector<doc_with_score> InvertedIndex::get_scores(const std::vector<std::str
 	}
 	return scores;
 }
+std::vector<size_t> InvertedIndex::Phrase(std::vector<std::string> word_input)//短语查询
+{
+	std::vector<size_t>res;
+	int length = word_input.size();
+	if (length == 0) {
+		std::cout << "no input" << "\n";
+		return std::vector<size_t>();//长度为0
+	}
+	int now_index = 0;//p1
+	int index_p1, index_p2;
+	PostingList list_p1, list_p2;
+	auto flag = dictionary.find(word_input[0]);
+	if (flag == dictionary.end()) {
+		return std::vector<size_t>();
+	}
+	list_p1 = dictionary.find(word_input[0])->second;
+	while (length > now_index+1)
+	{
+		index_p2 = now_index + 1;
+		auto flag = dictionary.find(word_input[index_p2]);
+		if (flag == dictionary.end()) {
+			return std::vector<size_t>();
+		}
+		list_p2 = dictionary.find(word_input[index_p2])->second;
+		list_p1 = Intersect(list_p1, list_p2, 1);
+		now_index++;
+	}
+	for (int i = 0; i < list_p1.list.size(); i++)
+	{
+		res.push_back(list_p1.list[i].docID);
+	}
+	if (list_p1.list.size()==0)
+	{
+		std::cout << "not found";
+	}
+	list_p1.Output();
+	return res;//输出list_p1的转化项
+}
+
+PostingList InvertedIndex::Intersect(PostingList p1, PostingList p2, int k)//位置索引的合并算法
+{
+	PostingList res;
+	int length_p1 = p1.list.size();
+	int length_p2 = p2.list.size();
+	int now_p1=0, now_p2=0;
+	int pos_p1, pos_p2, pos_ind_p1, pos_ind_p2;
+	IndexNode temp_list;
+	while (now_p1<length_p1&&now_p2<length_p2)
+	{
+		if (p1.list[now_p1].docID == p2.list[now_p2].docID) {
+			temp_list.positions.clear();
+			temp_list.docID = p1.list[now_p1].docID;
+			pos_ind_p1 = 0;
+			pos_ind_p2 = 0;
+			pos_p1 = p1.list[now_p1].positions[pos_ind_p1];
+			pos_p2 = p2.list[now_p2].positions[pos_ind_p2];
+			while (pos_ind_p1<p1.list[now_p1].positions.size())
+			{
+				pos_p1 = p1.list[now_p1].positions[pos_ind_p1];
+				while (pos_ind_p2 < p2.list[now_p2].positions.size())
+				{
+					pos_p2 = p2.list[now_p2].positions[pos_ind_p2];
+					if (pos_p2-pos_p1==k)
+					{
+						temp_list.positions.push_back(pos_p2);
+					}
+					else
+					{
+						if (pos_p2>pos_p1)
+						{
+							break;
+						}
+					}
+					pos_ind_p2++;
+				}
+				pos_ind_p1++;
+			}
+			if (temp_list.positions.size()!=0)
+				res.list.push_back(temp_list);
+			now_p1++;
+			now_p2++;
+		}
+		else
+		{
+			if (p1.list[now_p1].docID < p2.list[now_p2].docID)
+			{
+				now_p1++;
+			}
+			else {
+				now_p2++;
+			}
+		}
+	}
+	return res;
+}
+
 
 void InvertedIndex::Output() const
 {

@@ -121,6 +121,22 @@ void bind_command()
 		pmx.Add("that");
 		pmx.Add("thus");
 	};
+	cmd["phrase"] = []() {
+		string s;
+		getline(cin, s);
+		vector<std::string>words;
+		words = split(s);
+		for (auto& str : words) str = word_stem(str);
+		idx.Phrase(words);
+	};
+	
+	/*cmd["xbrdebug"] = []() {
+		vector<std::string> words(2);
+		words[0] = "crop";
+		words[1] = "cocoa";
+		for (auto& str : words) str = word_stem(str);
+		idx.Phrase(words);
+	};*/
 }
 
 int main()
