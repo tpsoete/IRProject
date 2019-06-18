@@ -20,7 +20,7 @@ public:
     
     void AddFile(std::string filename);		// add a text file into the index
     std::vector<size_t> Search(std::string word);	// simple search for a single word
-    std::vector<size_t> TopK(const std::vector<std::string>& words, int k);
+    std::vector<doc_with_score> TopK(const std::vector<std::string>& words, int k);
     std::vector<doc_with_score> get_scores(const std::vector<std::string>& words);
 
 	std::vector<size_t> Boolean_serach(std::string cmd); //boolean search

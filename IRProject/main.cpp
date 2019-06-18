@@ -79,7 +79,7 @@ void bind_command()
 		cin.unget();
 		words = split(s);
 		for (auto& str : words) str = word_stem(str);
-		auto ans = idx.get_scores(words);
+		auto ans = idx.TopK(words,k);
 		for (auto x : ans) {
 			printf("%20s%20f\n", idx.docName[x.doc_id].c_str(), x.score);
 		}

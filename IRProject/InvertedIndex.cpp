@@ -59,9 +59,9 @@ std::vector<size_t> InvertedIndex::Search(std::string word)
 	return ans;
 }
 
-std::vector<size_t> InvertedIndex::TopK(const std::vector<std::string>& words, int k)
+std::vector<doc_with_score> InvertedIndex::TopK(const std::vector<std::string>& words, int k)
 {
-	std::vector<size_t> ans;
+	std::vector<doc_with_score> ans;
 	std::vector<doc_with_score> heap;
 	heap = get_scores(words);
 	for (int n = 0; n < k; n++) {
@@ -70,9 +70,9 @@ std::vector<size_t> InvertedIndex::TopK(const std::vector<std::string>& words, i
 		{
 			doc_with_score temp = heap[i];
 			int c = 2 * i + 1;
-			while (c <= CurrentSize)
+			while (c < CurrentSize)
 			{
-				if (c < CurrentSize && heap[c].score < heap[c + 1].score)
+				if (c < CurrentSize - 1 && heap[c].score < heap[c + 1].score)
 					c++;
 				if (temp.score >= heap[c].score)
 					break;
@@ -80,16 +80,17 @@ std::vector<size_t> InvertedIndex::TopK(const std::vector<std::string>& words, i
 				{
 					heap[(c - 1) / 2] = heap[c];
 					c = 2 * c + 1;
-				}        
+				}
 			}
 			heap[(c - 1) / 2] = temp;
 		}
-		ans.push_back(heap[0].doc_id);
+		ans.push_back(heap[0]);
 		heap[0] = heap[CurrentSize - 1];
 		heap.pop_back();
 	}
-    return ans;
+	return ans;
 }
+
 
 std::vector<doc_with_score> InvertedIndex::get_scores(const std::vector<std::string>& words)
 {
@@ -104,36 +105,32 @@ std::vector<doc_with_score> InvertedIndex::get_scores(const std::vector<std::str
 		size_t df = List.list.size();
 		for (int j = 0; j < N; j++) {
 			size_t tf = List.get_tf(j);
-			if(tf==0){
+			if (tf == 0 || df == 0 || df == N) {
 				w.push_back(0);
 			}
-			else{
-				w.push_back((1 + log(tf))*log(N / df));
+			else {
+				w.push_back((1 + log10(tf))*log10(N / df));
 			}
 		}
-		w.push_back((1 + log(1))*log(N / df));//tf-idf of the searching words
+		//tf-idf of the searching words
+		if (df == 0 || df == N)
+			w.push_back(0);
+		else
+			w.push_back((1 + log10(1))*log10(N / df));
 		W.push_back(w);
 		w.clear();
 	}
 	//normalize the score
 	double score = 0;
-	double mold_n = 0;
-	for (int j = 0; j < M; j++) {
-		mold_n += W[j][N] * W[j][N];
-	}
-	mold_n = sqrt(mold_n);
 	//get cosine score of all the document with the searching words
 	for (int i = 0; i < N; i++) {
-		double score=0;
-		double mold = 0;
+		double score = 0;
 		for (int j = 0; j < M; j++) {
 			score += W[j][i] * W[j][N];
-			mold += W[j][i] * W[j][i];
 		}
-		mold = sqrt(mold);
 		doc_with_score s;
 		s.doc_id = i;
-		s.score = score/(mold*mold_n);
+		s.score = score/docLength[i];
 		scores.push_back(s);
 	}
 	return scores;
