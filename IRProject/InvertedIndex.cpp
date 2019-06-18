@@ -297,7 +297,7 @@ std::vector<size_t> InvertedIndex::Boolean_serach(std::string cmd) {
 			std::vector<size_t> new_result;
 			sort(tmp.begin(), tmp.end());
 			if (not_flag) {
-				size_t i = 0;
+/*				size_t i = 0;
 				std::vector<size_t> not_tmp;
 				int index = 0;
 				while (i < docName.size()) {
@@ -315,7 +315,8 @@ std::vector<size_t> InvertedIndex::Boolean_serach(std::string cmd) {
 						}
 					}
 				}
-				tmp = not_tmp;
+				tmp = not_tmp;*/
+				tmp = DocIDList_not(tmp);
 			}
 			int index1 = 0, index2 = 0;
 			switch (op_flag) {
@@ -323,7 +324,7 @@ std::vector<size_t> InvertedIndex::Boolean_serach(std::string cmd) {
 				std::cout << "error syntax in boolean search£¡ " << std::endl;
 				break;
 			case 1: //case :AND
-				while (index1 < result.size() && index2 < tmp.size()) {
+				/*while (index1 < result.size() && index2 < tmp.size()) {
 					if (result[index1] < tmp[index2]) {
 						++index1;
 					}
@@ -335,10 +336,11 @@ std::vector<size_t> InvertedIndex::Boolean_serach(std::string cmd) {
 					else if (result[index1] > tmp[index2]) {
 						++index2;
 					}
-				}
+				}*/
+				result = DocIDList_and(result, tmp);
 				break;
 			case 2: //case : OR
-				while (index1 < result.size() && index2 < tmp.size()) {
+/*				while (index1 < result.size() && index2 < tmp.size()) {
 					if (result[index1] < tmp[index2]) {
 						new_result.push_back(result[index1]);
 						++index1;
@@ -360,12 +362,13 @@ std::vector<size_t> InvertedIndex::Boolean_serach(std::string cmd) {
 				while (index2 < tmp.size()) {
 					new_result.push_back(tmp[index2]);
 					++index2;
-				}
+				}*/
+				result = DocIDList_or(result, tmp);
 				break;
 			}
 			not_flag = 0;
 			op_flag = 0;
-			result = new_result;
+			//result = new_result;
 		}
 	}
 	return result;
@@ -415,6 +418,75 @@ std::string InvertedIndex::Spell_correction(std::string source) {
 	}
 	return all_words[min_index];
 
+}
+
+std::vector<size_t> InvertedIndex::DocIDList_and(std::vector<size_t> list1, std::vector<size_t> list2){
+	int index1 = 0, index2 = 0;
+	std::vector<size_t> result;
+	while (index1 < list1.size() && index2 < list2.size()) {
+		if (list1[index1] < list2[index2]) {
+			++index1;
+		}
+		else if (list1[index1] == list2[index2]) {
+			result.push_back(list1[index1]);
+			++index1;
+			++index2;
+		}
+		else if (list1[index1] > list2[index2]) {
+			++index2;
+		}
+	}
+	return result;
+}
+std::vector<size_t> InvertedIndex::DocIDList_or(std::vector<size_t> list1, std::vector<size_t> list2) {
+	int index1 = 0, index2 = 0;
+	std::vector<size_t> result;
+	while (index1 < list1.size() && index2 < list2.size()) {
+		if (list1[index1] < list2[index2]) {
+			result.push_back(list1[index1]);
+			++index1;
+		}
+		else if (list1[index1] == list2[index2]) {
+			result.push_back(list1[index1]);
+			++index1;
+			++index2;
+		}
+		else if (list1[index1] > list2[index2]) {
+			result.push_back(list2[index2]);
+			++index2;
+		}
+	}
+	while (index1 < list1.size()) {
+		result.push_back(list1[index1]);
+		++index1;
+	}
+	while (index2 < list2.size()) {
+		result.push_back(list2[index2]);
+		++index2;
+	}
+	return result;
+}
+
+std::vector<size_t> InvertedIndex::DocIDList_not(std::vector<size_t> list) {
+	size_t i = 0;
+	std::vector<size_t> result;
+	int index = 0;
+	while (i < docName.size()) {
+		if (i < list[index]) {
+			result.push_back(i);
+			++i;
+		}
+		else {
+			++index;
+			if (index >= list.size()) {
+				for (; i < docName.size(); ++i) {
+					result.push_back(i);
+				}
+				break;
+			}
+		}
+	}
+	return result;
 }
 
 void InvertedIndex::Output() const
