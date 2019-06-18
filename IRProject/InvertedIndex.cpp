@@ -28,9 +28,9 @@ void InvertedIndex::AddFile(std::string filename)
 	size_t cnt = 0;
 	// INDEX GENERATION
 	while (f.GetWord(c)) {
-		// standardize the word
-		word_stem(c);
-		std::string cs(c);
+		for (int i = 0; c[i]; i++) c[i] = tolower(c[i]);
+		// add into the permuterm index and stem the word (in permuterms.add())
+		std::string cs = permuterms.Add(c);
 		// find the word and insert if unfound
 		auto it = dictionary.find(cs);
 		if (it == dictionary.end()) it = dictionary.emplace(cs, PostingList()).first;

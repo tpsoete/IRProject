@@ -17,6 +17,7 @@ std::string PermutermIndex::Add(const std::string & word)
 
 static std::regex make_pattern(const std::string& pattern)
 {
+	// replace * with .* to form a regular expression
 	std::string s = "";
 	for (auto ch : pattern) {
 		if (ch == '*') s += ".*";
@@ -27,6 +28,7 @@ static std::regex make_pattern(const std::string& pattern)
 
 static std::string restore(const std::string& permuterm)
 {
+	// e.g. llo$he ==> hello
 	int i, n = (int)permuterm.length();
 	for (i = 0; i < n; i++) if (permuterm[i] == '$') break;
 	if (i == n) return permuterm;
@@ -63,9 +65,11 @@ std::set<std::string> PermutermIndex::FuzzySearch(const std::string & pattern) c
 	std::regex re = make_pattern(pattern);
 	for (auto it = lower; it != upper; ++it) {
 		std::string origin = restore(it->first);
+		// revise the answers using regex
 		if (std::regex_match(origin, re)) {
-			ans.insert(it->second);
-			printf("=%s\n", origin.c_str());
+			//ans.insert(it->second);
+			ans.insert(origin);
+			//printf("=%s\n", origin.c_str());
 		}
 	}
 	return ans;

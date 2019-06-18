@@ -11,7 +11,8 @@ void bind_command()
 {
 	static char buf[256];
 
-    // connect input strings with functions
+    // connect input strings with functions(lambda expression)
+	// format: cmd["command"] = []() { /* what to do */ };
 
 	cmd["help"] = []() {	
 		// hint info
@@ -21,6 +22,7 @@ void bind_command()
 		puts("stem %s - word stemming"); 
 		puts("search %s - simple search, return the posting list");
 		puts("add %d - add a Reuter document");
+		puts("fuzzy %s - fuzzy search, only return unstemmed words for simplicity");
 	};
 
 	cmd["stem"] = []() {
@@ -42,6 +44,15 @@ void bind_command()
 		idx.AddFile(reuters(i));
 	};
 
+	cmd["fuzzy"] = []() {
+		string s;
+		cin >> s;
+		auto ans = idx.permuterms.FuzzySearch(s);
+		for (auto& str : ans) cout << str << endl;
+	};
+
+	// debug
+
 	cmd["check"] = []() {
 		idx.Output();
 	};
@@ -51,6 +62,8 @@ void bind_command()
 		for (size_t i = 0; i < idx.docName.size(); i++)
 			printf("%zd\t%s\n", i, idx.docName[i].c_str());
 	};
+
+	// test for permuterm index
 
 	cmd["permadd"] = []() {
 		string s;

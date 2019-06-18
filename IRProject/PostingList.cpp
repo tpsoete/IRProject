@@ -7,11 +7,6 @@ PostingList::PostingList()
 	frequency = 0;
 }
 
-
-PostingList::~PostingList()
-{
-}
-
 void PostingList::Add(size_t docID, size_t position)
 {
 	if (!list.empty() && docID < list.back().docID) {
