@@ -64,9 +64,9 @@ std::vector<size_t> InvertedIndex::TopK(std::vector<std::string> words, int k)
 			int c = 2 * i + 1;
 			while (c <= CurrentSize)
 			{
-				if (c < CurrentSize && heap[c].scrore < heap[c + 1].scrore)
+				if (c < CurrentSize && heap[c].score < heap[c + 1].score)
 					c++;
-				if (temp.scrore >= heap[c].scrore)
+				if (temp.score >= heap[c].score)
 					break;
 				else
 				{
@@ -102,15 +102,25 @@ std::vector<doc_with_score> InvertedIndex::get_scores(std::vector<std::string> w
 		W.push_back(w);
 		w.clear();
 	}
+	//normalize the score
+	double score = 0;
+	double mold_n = 0;
+	for (int j = 0; j < M; j++) {
+		mold_n += W[j][N] * W[j][N];
+	}
+	mold_n = sqrt(mold_n);
 	//get cosine score of all the document with the searching words
 	for (int i = 0; i < N; i++) {
 		double score=0;
+		double mold = 0;
 		for (int j = 0; j < M; j++) {
 			score += W[j][i] * W[j][N];
+			mold += W[j][i] * W[j][i];
 		}
+		mold = sqrt(mold);
 		doc_with_score s;
 		s.doc_id = i;
-		s.scrore = score;
+		s.score = score/(mold*mold_n);
 		scores.push_back(s);
 	}
 	return scores;
