@@ -11,13 +11,13 @@ InvertedIndex::~InvertedIndex()
 {
 }
 
-void InvertedIndex::AddFile(std::string filename)
+bool InvertedIndex::AddFile(std::string filename)
 {
 	TextFile f(filename.c_str());
 	// the file is not exist
 	if (f.file == NULL) {
 		// printf("%s does not exist!\n", filename.c_str());
-		return;
+		return false;
 	}
 	size_t docn = docName.size();
 	// allocate memory for filenames and assign a new id for the document
@@ -46,6 +46,7 @@ void InvertedIndex::AddFile(std::string filename)
 		p.Add(docn, ++cnt);
 	}
 	docLength.push_back(cnt);
+	return true;
 }
 
 std::vector<size_t> InvertedIndex::Search(std::string word)

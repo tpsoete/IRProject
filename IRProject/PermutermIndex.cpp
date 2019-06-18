@@ -59,7 +59,8 @@ std::set<std::string> PermutermIndex::Wildcard(const std::string & pattern) cons
 
 	printf("actual search %s*\n", query.c_str());
 	auto lower = index.lower_bound(query);
-	query.back()++;
+	if (query.empty()) query = "\x7e";
+	else query.back()++;
 	auto upper = index.upper_bound(query);
 
 	std::regex re = make_pattern(pattern);
