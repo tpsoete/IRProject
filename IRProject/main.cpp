@@ -121,6 +121,13 @@ void bind_command()
 		pmx.Add("that");
 		pmx.Add("thus");
 	};
+
+	cmd["boolean"] = [] {
+		string s;
+		getline(cin, s);
+		auto ans = idx.Boolean_serach(s);
+		for (auto& str : ans) cout << str << endl;
+	};
 }
 
 int main()

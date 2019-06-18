@@ -2,6 +2,8 @@
 
 #include "PostingList.h"
 #include "PermutermIndex.h"
+#include <algorithm>
+#include <sstream>
 
 class InvertedIndex
 {
@@ -20,6 +22,9 @@ public:
     std::vector<size_t> Search(std::string word);	// simple search for a single word
     std::vector<size_t> TopK(const std::vector<std::string>& words, int k);
     std::vector<doc_with_score> get_scores(const std::vector<std::string>& words);
+
+	std::vector<size_t> Boolean_serach(std::string cmd); //boolean search
+	std::string Spell_correction(std::string error_word); //spell correction
 
 	void Output() const;
 };

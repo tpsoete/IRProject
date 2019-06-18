@@ -139,6 +139,190 @@ std::vector<doc_with_score> InvertedIndex::get_scores(const std::vector<std::str
 	return scores;
 }
 
+
+/* The following is added by Span
+ * Boolean search, cmd is what user puts in
+ * the function will check whether the input is legal
+ * does not support brackets
+ * for example: "a AND b OR NOT c"
+ */
+std::vector<size_t> InvertedIndex::Boolean_serach(std::string cmd) {
+	std::stringstream iss(cmd);
+	std::string token_item;
+	std::vector<std::string> tokens;
+	std::vector<size_t> result;
+
+	int op_flag = 1;
+	//0 for waiting for 'AND' or 'OR', 1 for 'AND' and 2 for 'OR'
+	bool not_flag = false;
+
+	//the following is to split the command into tokens.
+	while (std::getline(iss, token_item, ' ')) {
+		for (auto c : token_item) {
+			if (c == ' ') {
+				continue;
+			}
+		}
+		if (token_item.size() > 0)
+			tokens.push_back(word_stem(token_item));
+	}
+
+
+	for (auto tok : tokens) {
+		if (stricmp(tok.c_str(), "and") == 0) {
+			if (op_flag == 1 || op_flag == 2) {
+				std::cout << "error syntax in boolean search£¡" << std::endl;
+				exit(1);
+			}
+			else {
+				op_flag = 1;
+				continue;
+			}
+		}
+		else if (stricmp(tok.c_str(), "or") == 0) {
+			if (op_flag == 1 || op_flag == 2) {
+				std::cout << "error syntax in boolean search£¡" << std::endl;
+				exit(1);
+			}
+			else {
+				op_flag = 2;
+				continue;
+			}
+		}
+		else if (stricmp(tok.c_str(), "not") == 0) {
+			if (op_flag == 0) {
+				std::cout << "error syntax in boolean search£¡ " << std::endl;
+				exit(1);
+			}
+			else {
+				not_flag = not(not_flag);
+			}
+		}
+		else {
+			std::vector<size_t> tmp = Search(tok);
+			std::vector<size_t> new_result;
+			sort(tmp.begin(), tmp.end());
+			if (not_flag) {
+				size_t i = 0;
+				std::vector<size_t> not_tmp;
+				int index = 0;
+				while (i < docName.size()) {
+					if (i < tmp[index]) {
+						not_tmp.push_back(i);
+						++i;
+					}
+					else {
+						++index;
+						if (index >= tmp.size()) {
+							for (; i < docName.size(); ++i) {
+								not_tmp.push_back(i);
+							}
+							break;
+						}
+					}
+				}
+				tmp = not_tmp;
+			}
+			int index1 = 0, index2 = 0;
+			switch (op_flag) {
+			case 0:
+				std::cout << "error syntax in boolean search£¡ " << std::endl;
+				break;
+			case 1: //case :AND
+				while (index1 < result.size() && index2 < tmp.size()) {
+					if (result[index1] < tmp[index2]) {
+						++index1;
+					}
+					else if (result[index1] == tmp[index2]) {
+						new_result.push_back(result[index1]);
+						++index1;
+						++index2;
+					}
+					else if (result[index1] > tmp[index2]) {
+						++index2;
+					}
+					break;
+				}
+			case 2: //case : OR
+				while (index1 < result.size() && index2 < tmp.size()) {
+					if (result[index1] < tmp[index2]) {
+						new_result.push_back(result[index1]);
+						++index1;
+					}
+					else if (result[index1] == tmp[index2]) {
+						new_result.push_back(result[index1]);
+						++index1;
+						++index2;
+					}
+					else if (result[index1] > tmp[index2]) {
+						new_result.push_back(tmp[index2]);
+						++index2;
+					}
+				}
+				while (index1 < result.size()) {
+					new_result.push_back(result[index1]);
+					++index1;
+				}
+				while (index2 < tmp.size()) {
+					new_result.push_back(tmp[index2]);
+					++index2;
+				}
+				break;
+			}
+			not_flag = 0;
+			op_flag = 0;
+			result = new_result;
+		}
+	}
+	return result;
+}
+
+
+std::string InvertedIndex::Spell_correction(std::string source) {
+	std::vector<std::string> all_words;
+	std::vector<int> scores;
+	int min_index = 0;
+	if (source.length() == 0)
+		return "";
+	auto it = dictionary.begin();
+	while (it != dictionary.end()) {
+		auto target = it->first;
+		int n = source.length();
+		int m = target.length();
+		std::vector<std::vector<int>> matrix(n + 1);
+		for (int i = 0; i <= n; i++) matrix[i].resize(m + 1);
+		for (int i = 1; i <= n; i++) matrix[i][0] = i;
+		for (int i = 1; i <= m; i++) matrix[0][i] = i;
+		for (int i = 1; i <= n; i++) {
+			const char si = source[i - 1];
+			for (int j = 1; j <= m; j++) {
+				const char dj = target[j - 1];
+				int cost;
+				if (si == dj) {
+					cost = 0;
+				}
+				else {
+					cost = 1;
+				}
+				const int above = matrix[i - 1][j] + 1;
+				const int left = matrix[i][j - 1] + 1;
+				const int diag = matrix[i - 1][j - 1] + cost;
+				matrix[i][j] = std::min(above, std::min(left, diag));
+			}
+		}
+		scores.push_back(matrix[n][m]);
+		all_words.push_back(target);
+
+	}
+	for (int i = 0; i < scores.size(); ++i) {
+		if (scores[min_index] >= scores[i]) {
+			min_index = i;
+		}
+	}
+	return all_words[min_index];
+
+}
+
 void InvertedIndex::Output() const
 {
 	for (auto& p : dictionary) {
