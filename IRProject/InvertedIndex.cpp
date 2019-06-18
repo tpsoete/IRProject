@@ -96,7 +96,12 @@ std::vector<doc_with_score> InvertedIndex::get_scores(std::vector<std::string> w
 		size_t df = List.list.size();
 		for (int j = 0; j < N; j++) {
 			size_t tf = List.get_tf(j);
-			w.push_back((1 + log(tf))*log(N / df));
+			if(tf==0){
+				w.push_back(0);
+			}
+			else{
+				w.push_back((1 + log(tf))*log(N / df));
+			}
 		}
 		w.push_back((1 + log(1))*log(N / df));//tf-idf of the searching words
 		W.push_back(w);
