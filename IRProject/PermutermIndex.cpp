@@ -35,7 +35,7 @@ static std::string restore(const std::string& permuterm)
 	return permuterm.substr(i + 1) + permuterm.substr(0, i);
 }
 
-std::set<std::string> PermutermIndex::FuzzySearch(const std::string & pattern) const
+std::set<std::string> PermutermIndex::Wildcard(const std::string & pattern) const
 {
 	std::set<std::string> ans;
 	int i, n = (int)pattern.length();

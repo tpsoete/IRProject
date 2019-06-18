@@ -51,7 +51,7 @@ std::vector<size_t> InvertedIndex::Search(std::string word)
 	return ans;
 }
 
-std::vector<size_t> InvertedIndex::TopK(std::vector<std::string> words, int k)
+std::vector<size_t> InvertedIndex::TopK(const std::vector<std::string>& words, int k)
 {
 	std::vector<size_t> ans;
 	std::vector<doc_with_score> heap;
@@ -83,7 +83,7 @@ std::vector<size_t> InvertedIndex::TopK(std::vector<std::string> words, int k)
     return ans;
 }
 
-std::vector<doc_with_score> InvertedIndex::get_scores(std::vector<std::string> words)
+std::vector<doc_with_score> InvertedIndex::get_scores(const std::vector<std::string>& words)
 {
 	std::vector<doc_with_score> scores;
 	const size_t N = docName.size();

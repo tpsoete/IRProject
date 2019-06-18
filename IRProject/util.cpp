@@ -33,3 +33,18 @@ std::string reuters(int i)
 	sprintf(s, "Reuters/%d.html", i);
 	return s;
 }
+
+std::vector<std::string> split(const std::string & s)
+{
+	std::vector<std::string> ans;
+	size_t i = 0, j, n = s.length();
+	for (;;) {
+		while (i < n && s[i] == ' ') ++i;
+		j = i;
+		while (j < n && s[j] != ' ') ++j;
+		ans.emplace_back(s.substr(i, j - i));
+		if (j == n) break;
+		i = j;
+	}
+	return ans;
+}

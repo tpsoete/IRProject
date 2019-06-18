@@ -22,7 +22,8 @@ void bind_command()
 		puts("stem %s - word stemming"); 
 		puts("search %s - simple search, return the posting list");
 		puts("add %d - add a Reuter document");
-		puts("fuzzy %s - fuzzy search, only return unstemmed words for simplicity");
+		puts("wildcard %s - fuzzy search, only return unstemmed words for simplicity");
+		puts("topk %d %s %s ... - TopK search, the first parameter is k. e.g. 'topk 3 how much'");
 	};
 
 	cmd["stem"] = []() {
@@ -44,11 +45,30 @@ void bind_command()
 		idx.AddFile(reuters(i));
 	};
 
-	cmd["fuzzy"] = []() {
+	cmd["wildcard"] = []() {
 		string s;
 		cin >> s;
-		auto ans = idx.permuterms.FuzzySearch(s);
+		auto ans = idx.permuterms.Wildcard(s);
 		for (auto& str : ans) cout << str << endl;
+	};
+
+	cmd["topk"] = []() {
+		int k;
+		string s;
+		vector<string> words;
+		cin >> k;
+		if (k <= 1) {
+			puts("invalid k");
+			return;
+		}
+		getline(cin, s);
+		cin.unget();
+		words = split(s);
+		for (auto& str : words) str = word_stem(str);
+		auto ans = idx.get_scores(words);
+		for (auto x : ans) {
+			printf("%20s%20f\n", idx.docName[x.doc_id].c_str(), x.score);
+		}
 	};
 
 	// debug
@@ -74,7 +94,7 @@ void bind_command()
 	cmd["perm"] = []() {
 		string s;
 		cin >> s;
-		auto ans = pmx.FuzzySearch(s);
+		auto ans = pmx.Wildcard(s);
 		for (auto& str : ans) cout << str << endl;
 	};
 
