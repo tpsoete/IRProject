@@ -10,6 +10,8 @@ public:
 	std::map<std::string, PostingList> dictionary;
 	PermutermIndex permuterms;
 
+	bool bWildcard;		// enable wildcard search
+
 	InvertedIndex();
 	~InvertedIndex();
     

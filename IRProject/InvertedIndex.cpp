@@ -16,10 +16,10 @@ void InvertedIndex::AddFile(std::string filename)
 	TextFile f(filename.c_str());
 	// the file is not exist
 	if (f.file == NULL) {
-		printf("%s does not exist!\n", filename.c_str());
+		// printf("%s does not exist!\n", filename.c_str());
 		return;
 	}
-	size_t l = filename.length(), docn = docName.size();
+	size_t docn = docName.size();
 	// allocate memory for filenames and assign a new id for the document
 	docName.push_back(filename);
 
@@ -30,7 +30,14 @@ void InvertedIndex::AddFile(std::string filename)
 	while (f.GetWord(c)) {
 		for (int i = 0; c[i]; i++) c[i] = tolower(c[i]);
 		// add into the permuterm index and stem the word (in permuterms.add())
-		std::string cs = permuterms.Add(c);
+		std::string cs;
+		if (bWildcard) {
+			cs = permuterms.Add(c);
+		}
+		else {
+			word_stem(c);
+			cs = c;
+		}
 		// find the word and insert if unfound
 		auto it = dictionary.find(cs);
 		if (it == dictionary.end()) it = dictionary.emplace(cs, PostingList()).first;

@@ -10,6 +10,11 @@ map<string, function<void()> > cmd;
 void bind_command()
 {
 	static char buf[256];
+	static bool all = false;
+
+	// initialize
+
+	idx.bWildcard = false;
 
     // connect input strings with functions(lambda expression)
 	// format: cmd["command"] = []() { /* what to do */ };
@@ -22,7 +27,7 @@ void bind_command()
 		puts("stem %s - word stemming"); 
 		puts("search %s - simple search, return the posting list");
 		puts("add %d - add a Reuter document");
-		puts("wildcard %s - fuzzy search, only return unstemmed words for simplicity");
+		puts("wildcard %s - wildcard search, only return unstemmed words for simplicity");
 		puts("topk %d %s %s ... - TopK search, the first parameter is k. e.g. 'topk 3 how much'");
 	};
 
@@ -43,6 +48,15 @@ void bind_command()
 		int i;
 		cin >> i;
 		idx.AddFile(reuters(i));
+	};
+
+	cmd["addall"] = []() {
+		if (all) return;
+		for (int i = 1; i <= 21576; i++) {
+			idx.AddFile(reuters(i));
+			if (i % 1000 == 0) printf("%d\n", i);
+		}
+		all = true;
 	};
 
 	cmd["wildcard"] = []() {
