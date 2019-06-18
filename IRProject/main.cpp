@@ -3,7 +3,8 @@
 
 using namespace std;
 
-InvertedIndex idx; 
+InvertedIndex idx;
+PermutermIndex pmx;
 
 map<string, function<void()> > cmd;
 void bind_command()
@@ -16,7 +17,7 @@ void bind_command()
 		// hint info
 		puts("exit - exit this program");
 		puts("help - print this help");
-
+		puts("");
 		puts("stem %s - word stemming"); 
 		puts("search %s - simple search, return the posting list");
 		puts("add %d - add a Reuter document");
@@ -49,6 +50,29 @@ void bind_command()
 		puts("docID\tName");
 		for (size_t i = 0; i < idx.docName.size(); i++)
 			printf("%zd\t%s\n", i, idx.docName[i].c_str());
+	};
+
+	cmd["permadd"] = []() {
+		string s;
+		cin >> s;
+		pmx.Add(s);
+	};
+
+	cmd["perm"] = []() {
+		string s;
+		cin >> s;
+		auto ans = pmx.FuzzySearch(s);
+		for (auto& str : ans) cout << str << endl;
+	};
+
+	cmd["permlist"] = []() {
+		pmx.Output();
+	};
+
+	cmd["perminit"] = []() {
+		pmx.Add("this");
+		pmx.Add("that");
+		pmx.Add("thus");
 	};
 }
 

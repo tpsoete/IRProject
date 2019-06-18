@@ -1,7 +1,7 @@
 #pragma once
 
 #include "PostingList.h"
-#include<map>
+#include "PermutermIndex.h"
 
 class InvertedIndex
 {

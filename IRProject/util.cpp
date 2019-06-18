@@ -30,6 +30,6 @@ std::string word_stem(const std::string & s)
 std::string reuters(int i)
 {
 	static char s[30];
-	sprintf(s, "Reuters\\%d.html", i);
+	sprintf(s, "Reuters/%d.html", i);
 	return s;
 }

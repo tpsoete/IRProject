@@ -33,6 +33,9 @@
     <ClCompile Include="TextFile.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="PermutermIndex.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InvertedIndex.h">
@@ -45,6 +48,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="TextFile.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PermutermIndex.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
