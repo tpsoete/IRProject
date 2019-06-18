@@ -21,6 +21,16 @@ void PostingList::Add(size_t docID, size_t position)
 	++frequency;
 }
 
+size_t PostingList::get_tf(size_t doc_id)
+{
+	for (int i = 0; i < list.size(); i++) {
+		if (list[i].docID==doc_id) {
+			return list[i].positions.size();
+		}
+	}
+	return 0;
+}
+
 void PostingList::Output(std::string word) const
 {
 	if (word.length()) printf("WORD %s\n", word.c_str());
