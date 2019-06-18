@@ -2,6 +2,11 @@
 
 #include "util.h"
 
+struct doc_with_score {
+	size_t doc_id;
+	double scrore;
+};
+
 struct IndexNode
 {
 	size_t docID;
