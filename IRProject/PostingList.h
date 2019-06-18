@@ -22,6 +22,7 @@ public:
 	PostingList();
 
 	void Add(size_t docID, size_t position);	// should only be used in InvertedIndex::AddFile
+	size_t get_tf(size_t doc_id);
 
 	void Output(std::string word = "") const;	// Debug output
 };
