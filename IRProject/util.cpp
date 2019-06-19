@@ -8,6 +8,7 @@ extern "C" {
 
 void word_stem(char* s)
 {
+	return;
 	int i, l = (int)strlen(s);
 	// stem function requires lowercase letters
 	for (i = 0; i < l; i++) s[i] = tolower(s[i]);
@@ -19,6 +20,7 @@ void word_stem(char* s)
 
 std::string word_stem(const std::string & s)
 {
+	return s;
 	char* buf = new char[s.length() + 1];
 	strcpy(buf, s.c_str());
 	word_stem(buf);

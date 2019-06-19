@@ -122,15 +122,24 @@ std::vector<doc_with_score> InvertedIndex::get_scores(const std::vector<std::str
 	}
 	//normalize the score
 	double score = 0;
+	double mold_n = 0;
+	for (int i = 0; i < M; i++) {
+		mold_n += W[i][N] * W[i][N];
+	}
 	//get cosine score of all the document with the searching words
 	for (int i = 0; i < N; i++) {
 		double score = 0;
+		double mold = 0;
 		for (int j = 0; j < M; j++) {
 			score += W[j][i] * W[j][N];
+			mold += W[j][i] * W[j][i];
 		}
 		doc_with_score s;
 		s.doc_id = i;
-		s.score = score/docLength[i];
+		if (mold == 0 || mold_n == 0)
+			s.score = 0;
+		else
+			s.score = score/(mold*mold_n);
 		scores.push_back(s);
 	}
 	return scores;
