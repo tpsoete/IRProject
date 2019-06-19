@@ -15,7 +15,7 @@ void bind_command()
 
 	// initialize
 
-	idx.bWildcard = false;
+	idx.bWildcard = true;
 
     // connect input strings with functions(lambda expression)
 	// format: cmd["command"] = []() { /* what to do */ };
