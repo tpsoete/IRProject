@@ -36,8 +36,8 @@ void bind_command()
 		puts("phrase %s %s ... - phrase search");
 		puts("");
 
-		puts("wildcard-word %s - wildcard search, only return unstemmed words");
-		puts("fuzzy-word %s - fuzzy search with correction, return the most likely word");
+		puts("wildcard %s - wildcard search, only return unstemmed words");
+		puts("fuzzy %s - fuzzy search with correction, return the most likely word");
 		puts("stem %s - word stemming");
 		puts("names - all loaded documents");
 		puts("");
@@ -95,7 +95,6 @@ void bind_command()
 			return;
 		}
 		getline(cin, s);
-		cin.unget();
 		words = split(s);
 		for (auto& str : words) str = word_stem(str);
 		auto ans = idx.TopK(words,k);
@@ -107,7 +106,6 @@ void bind_command()
 	cmd["boolean"] = [] {
 		string s;
 		getline(cin, s);
-		cin.unget();
 		auto ans = idx.Boolean_serach(s);
 		for (auto id : ans) cout << idx.docName[id] << endl;
 		printf("Found %zd document(s)\n", ans.size());
@@ -123,14 +121,14 @@ void bind_command()
 		for (auto id : ans) cout << idx.docName[id] << endl;
 	};
 
-	cmd["wildcard-word"] = []() {
+	cmd["wildcard"] = []() {
 		string s;
 		cin >> s;
 		auto ans = idx.permuterms.Wildcard(s);
 		for (auto& str : ans) cout << str << endl;
 	};
 
-	cmd["fuzzy-word"] = []() {
+	cmd["fuzzy"] = []() {
 		string s;
 		cin >> s;
 		cout << idx.Spell_correction(s) << endl;
@@ -155,14 +153,6 @@ void bind_command()
 			puts(p.first.c_str());
 		}
 	};
-	
-	/*cmd["xbrdebug"] = []() {
-		vector<std::string> words(2);
-		words[0] = "crop";
-		words[1] = "cocoa";
-		for (auto& str : words) str = word_stem(str);
-		idx.Phrase(words);
-	};*/
 }
 
 int main()
@@ -180,6 +170,7 @@ int main()
 			cmd["help"]();
         }
         else (it->second)();
+		cin.unget();
         getline(cin, input);    // clear the rest input in the line
     }
     puts("");
